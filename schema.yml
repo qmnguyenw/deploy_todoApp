@@ -1,0 +1,396 @@
+openapi: 3.0.2
+info:
+  title: ''
+  version: ''
+paths:
+  /task/:
+    get:
+      operationId: listTasks
+      description: ''
+      parameters:
+      - name: completed
+        required: false
+        in: query
+        description: completed
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    task_name:
+                      type: string
+                      maxLength: 100
+                    task_desc:
+                      type: string
+                      maxLength: 200
+                    completed:
+                      type: boolean
+                    date_created:
+                      type: string
+                      format: date-time
+                      readOnly: true
+                    image:
+                      type: string
+                      format: binary
+                      default: images/none/none.jpg
+                    doc:
+                      type: string
+                      format: binary
+                      default: docs/none/none.txt
+                  required:
+                  - task_name
+                  - task_desc
+          description: ''
+    post:
+      operationId: createTask
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &id001
+              properties:
+                task_name:
+                  type: string
+                  maxLength: 100
+                task_desc:
+                  type: string
+                  maxLength: 200
+                completed:
+                  type: boolean
+                image:
+                  type: string
+                  format: binary
+                  default: images/none/none.jpg
+                doc:
+                  type: string
+                  format: binary
+                  default: docs/none/none.txt
+              required:
+              - task_name
+              - task_desc
+          application/x-www-form-urlencoded:
+            schema: *id001
+          multipart/form-data:
+            schema: *id001
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  task_name:
+                    type: string
+                    maxLength: 100
+                  task_desc:
+                    type: string
+                    maxLength: 200
+                  completed:
+                    type: boolean
+                  date_created:
+                    type: string
+                    format: date-time
+                    readOnly: true
+                  image:
+                    type: string
+                    format: binary
+                    default: images/none/none.jpg
+                  doc:
+                    type: string
+                    format: binary
+                    default: docs/none/none.txt
+                required:
+                - task_name
+                - task_desc
+          description: ''
+  /task/{id}/:
+    get:
+      operationId: retrieveTask
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this task.
+        schema:
+          type: string
+      - name: completed
+        required: false
+        in: query
+        description: completed
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  task_name:
+                    type: string
+                    maxLength: 100
+                  task_desc:
+                    type: string
+                    maxLength: 200
+                  completed:
+                    type: boolean
+                  date_created:
+                    type: string
+                    format: date-time
+                    readOnly: true
+                  image:
+                    type: string
+                    format: binary
+                    default: images/none/none.jpg
+                  doc:
+                    type: string
+                    format: binary
+                    default: docs/none/none.txt
+                required:
+                - task_name
+                - task_desc
+          description: ''
+    put:
+      operationId: updateTask
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this task.
+        schema:
+          type: string
+      - name: completed
+        required: false
+        in: query
+        description: completed
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id002
+              properties:
+                task_name:
+                  type: string
+                  maxLength: 100
+                task_desc:
+                  type: string
+                  maxLength: 200
+                completed:
+                  type: boolean
+                image:
+                  type: string
+                  format: binary
+                  default: images/none/none.jpg
+                doc:
+                  type: string
+                  format: binary
+                  default: docs/none/none.txt
+              required:
+              - task_name
+              - task_desc
+          application/x-www-form-urlencoded:
+            schema: *id002
+          multipart/form-data:
+            schema: *id002
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  task_name:
+                    type: string
+                    maxLength: 100
+                  task_desc:
+                    type: string
+                    maxLength: 200
+                  completed:
+                    type: boolean
+                  date_created:
+                    type: string
+                    format: date-time
+                    readOnly: true
+                  image:
+                    type: string
+                    format: binary
+                    default: images/none/none.jpg
+                  doc:
+                    type: string
+                    format: binary
+                    default: docs/none/none.txt
+                required:
+                - task_name
+                - task_desc
+          description: ''
+    patch:
+      operationId: partial_updateTask
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this task.
+        schema:
+          type: string
+      - name: completed
+        required: false
+        in: query
+        description: completed
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id003
+              properties:
+                task_name:
+                  type: string
+                  maxLength: 100
+                task_desc:
+                  type: string
+                  maxLength: 200
+                completed:
+                  type: boolean
+                image:
+                  type: string
+                  format: binary
+                  default: images/none/none.jpg
+                doc:
+                  type: string
+                  format: binary
+                  default: docs/none/none.txt
+          application/x-www-form-urlencoded:
+            schema: *id003
+          multipart/form-data:
+            schema: *id003
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  task_name:
+                    type: string
+                    maxLength: 100
+                  task_desc:
+                    type: string
+                    maxLength: 200
+                  completed:
+                    type: boolean
+                  date_created:
+                    type: string
+                    format: date-time
+                    readOnly: true
+                  image:
+                    type: string
+                    format: binary
+                    default: images/none/none.jpg
+                  doc:
+                    type: string
+                    format: binary
+                    default: docs/none/none.txt
+                required:
+                - task_name
+                - task_desc
+          description: ''
+    delete:
+      operationId: destroyTask
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this task.
+        schema:
+          type: string
+      - name: completed
+        required: false
+        in: query
+        description: completed
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
