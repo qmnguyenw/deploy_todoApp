@@ -1,20 +1,12 @@
-from django.shortcuts import render, redirect
 from rest_framework import viewsets
 from rest_framework import filters
 import django_filters.rest_framework
 from .serializers import TaskSerializer
-# from .serializers import TaskSerializer, UserSerializer
 from .models import Task
 from rest_framework.permissions import IsAuthenticated, AllowAny
-# from rest_framework.generics import CreateAPIView
-# from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication, BasicAuthentication
 from django.http import HttpResponse, HttpResponseRedirect
-# from rest_framework.response import Response
-from rest_framework.reverse import reverse
-from rest_framework import generics
-
 
 class TaskViewSet(viewsets.ModelViewSet):
     # authentication_classes = (TokenAuthentication, SessionAuthentication)
@@ -56,23 +48,3 @@ def deleteAll(request):
     owner = request.user
     Task.objects.filter(owner_id=owner).delete()
     return HttpResponseRedirect(redirect_to='/task/')
-
-# class DueTaskViewSet(viewsets.ModelViewSet):
-#     queryset = Task.objects.all().order_by('-date_created').filter(completed=False)
-#     serializer_class = TaskSerializer
-
-# class CompletedTaskViewSet(viewsets.ModelViewSet):
-#     queryset = Task.objects.all().order_by('-date_created').filter(completed=True)
-#     serializer_class = TaskSerializer
-
-# class CreateUserView(CreateAPIView):
-#     # createApiView provide only POST method
-#     model = get_user_model()
-#     # set permission as allowany to register
-#     permission_classes = (AllowAny,)
-#     serializer_class = UserSerializer
-
-# class UserViewSet(viewsets.ModelViewSet):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-#     permission_classes = (AllowAny,)

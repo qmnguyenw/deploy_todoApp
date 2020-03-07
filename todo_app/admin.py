@@ -2,8 +2,6 @@ from django.contrib import admin
 from .models import Task
 
 # custom task field in admin page
-
-
 class TaskAdmin(admin.ModelAdmin):
     fieldsets = [
         (None,               {'fields': ['task_name']}),
@@ -16,7 +14,6 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ['task_name']  # search word
     list_per_page = 3  # paging
     date_hierarchy = 'date_created'
-
 
 # add to admin page
 admin.site.register(Task, TaskAdmin)
