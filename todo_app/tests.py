@@ -8,7 +8,8 @@ import json
 from django.urls import reverse
 from rest_framework import status, response
 
-class GetTaskList(TestCase): # PublicTasksApiTests
+# GET: /task/
+class GetTaskList(TestCase):
     
     def setUp(self):
         self.client = APIClient()
@@ -102,82 +103,3 @@ class CreateTask(TestCase):
             task_name=new_task['task_name'],
         ).exists()
         self.assertFalse(exists)
-
-# class PrivateTasksApiTests(TestCase):
-#     """Test the private tasks API"""
-
-#     def setUp(self):
-
-#         self.user = User.objects.create_user(
-#             'test',
-#             'testpass'
-#         )
-#         self.client.force_authenticate(self.user)
-#         Task.objects.create(
-#             task_name='Test GetAllTasksTest1',
-#             task_desc='GetAllTasksTest1 test description',
-#             completed='True',
-#         )
-#         self.user = User.objects.create_user(
-#             'test1',
-#             'testpass'
-#         )
-#         self.client.force_authenticate(self.user)
-#         Task.objects.create(
-#             task_name='Test GetAllTasksTest2',
-#             task_desc='GetAllTasksTest2 test description',
-#             completed='False',
-#         )
-
-#     def test_retrieve_task_list(self):
-#         """Test retrieving a list of tasks"""
-#         response = self.client.get(reverse('todo_app:task-list'))
-#         owner = self.user
-#         tasks = Task.objects.filter(owner_id=owner)
-#         serializer = TaskSerializer(tasks, many=True)
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response.data, serializer.data)
-
-#     def test_create_task_successful(self):
-#         """Test create a new task"""
-#         new_task = {
-#             'task_name': 'Test GetAllTasksTest3',
-#             'task_desc': 'GetAllTasksTest3 test description',
-#         }
-#         response = self.client.post(reverse('todo_app:task-list'), new_task)
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         exists = Task.objects.filter(
-#             owner=self.user,
-#             task_name=new_task['task_name'],
-#         ).exists()
-#         self.assertTrue(exists)
-
-#     def test_create_task_unsuccessful_with_unvalid(self):
-#         """Test create a new task"""
-#         new_task = {
-#             'task_name': 'f',  # required atrribute, cannot null
-#             'task_desc': '',  # required atrribute, cannot null
-#         }
-#         response = self.client.post(reverse('todo_app:task-list'), new_task)
-#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-#         exists = Task.objects.filter(
-#             owner=self.user,
-#             task_name=new_task['task_name'],
-#         ).exists()
-#         self.assertFalse(exists)
-
-    # def test_retrieve_task_detail(self):
-    #     """Test retrieving a list of tasks"""
-    #     response = self.client.get(reverse('todo_app:task-detail'))
-    #     owner = self.user
-    #     tasks = Task.objects.filter(owner_id=owner)
-    #     serializer = TaskSerializer(tasks, many=True)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(response.data, serializer.data)
-
-# class GetTaskDetailWithoutAuthentication(TestCase):
-
-#     def test_login_required_task_list(self):
-#         """Test that login is required to access the endpoint"""
-#         response = self.client.get(reverse('todo_app:task-detail'))
-#         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
