@@ -5,9 +5,9 @@ from django.contrib.auth.models import User
 # create serializer
 class TaskSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(
-        max_length=None, use_url=True, default='images/none/none.jpg')
+        max_length=None, use_url=False, default=None)
     doc = serializers.FileField(
-        max_length=None, use_url=True, default='docs/none/none.txt')
+        max_length=None, use_url=False, default=None)
     owner = serializers.ReadOnlyField(source='owner.username')
 
     class Meta:

@@ -10,7 +10,7 @@ from rest_framework import status, response
 
 # GET: /task/
 class GetTaskList(TestCase):
-    
+
     def setUp(self):
         self.client = APIClient()
 
@@ -21,32 +21,141 @@ class GetTaskList(TestCase):
 
     def test_retrieve_task_list(self):
         """Test retrieving a list of tasks with owner is the who login"""
-        self.user = User.objects.create_user(
-            'test',
-            'testpass'
-        )
-        self.client.force_authenticate(self.user)
-        Task.objects.create(
-            task_name='Test GetAllTasksTest1',
-            task_desc='test description',
-        )
-        self.user = User.objects.create_user(
+        user1 = User.objects.create_user(
             'test1',
             'testpass'
         )
-        self.client.force_authenticate(self.user)
+        Task.objects.create(
+            task_name='Test GetAllTasksTest1',
+            task_desc='test description',
+            owner=user1
+        )
+        user2 = User.objects.create_user(
+            'test2',
+            'testpass'
+        )
         Task.objects.create(
             task_name='Test GetAllTasksTest2',
             task_desc='test description',
+            owner=user2
         )
-
+        self.client.force_authenticate(user1)
         response = self.client.get(reverse('todo_app:task-list'))
-        owner = self.user
+        owner = user1
         tasks = Task.objects.filter(owner_id=owner)
         serializer = TaskSerializer(tasks, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
 
+
+# GET: /task/?completed=[True/Flase]/$
+class GetTaskListCompleted(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_login_required_task_list_completed(self):
+        """Test that login is required to access the endpoint"""
+        response = self.client.get('http://testserver/task/?completed=True')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_retrieve_task_list_completed(self):
+        """Test retrieving a list of tasks with owner is the who login"""
+        user1 = User.objects.create_user(
+            'test1',
+            'testpass'
+        )
+        Task.objects.create(
+            task_name='Test GetAllTasksTest1',
+            task_desc='test description',
+            completed='True',
+            owner=user1
+        )
+        Task.objects.create(
+            task_name='Test GetAllTasksTest2',
+            task_desc='test description',
+            completed='False',
+            owner=user1
+        )
+        Task.objects.create(
+            task_name='Test GetAllTasksTest3',
+            task_desc='test description',
+            completed='True',
+            owner=user1
+        )
+        user2 = User.objects.create_user(
+            'test2',
+            'testpass'
+        )
+        Task.objects.create(
+            task_name='Test GetAllTasksTest4',
+            task_desc='test description',
+            completed='True',
+            owner=user2
+        )
+        self.client.force_authenticate(user1)
+        response = self.client.get('http://testserver/task/?completed=True')
+        owner = user1
+        tasks = Task.objects.filter(owner_id=owner, completed=True)
+        serializer = TaskSerializer(tasks, many=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
+
+
+# GET: /task/?search=<title of task, description of task>[a-zA-Z0-9]+/$
+class GetTaskListSearch(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_login_required_task_list_completed(self):
+        """Test that login is required to access the endpoint"""
+        response = self.client.get('http://testserver/task/?completed=True')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_retrieve_task_list_completed(self):
+        """Test retrieving a list of tasks with owner is the who login"""
+        user1 = User.objects.create_user(
+            'test1',
+            'testpass'
+        )
+        Task.objects.create(
+            task_name='Test GetAllTasksTest1',
+            task_desc='test description',
+            completed='True',
+            owner=user1
+        )
+        Task.objects.create(
+            task_name='Test GetAllTasksTest2',
+            task_desc='test description',
+            completed='False',
+            owner=user1
+        )
+        Task.objects.create(
+            task_name='Test GetAllTasksTest3',
+            task_desc='test description',
+            completed='True',
+            owner=user1
+        )
+        user2 = User.objects.create_user(
+            'test2',
+            'testpass'
+        )
+        Task.objects.create(
+            task_name='Test GetAllTasksTest4',
+            task_desc='test description',
+            completed='True',
+            owner=user2
+        )
+        self.client.force_authenticate(user1)
+        response = self.client.get('http://testserver/task/?completed=True')
+        owner = user1
+        tasks = Task.objects.filter(owner_id=owner, completed=True)
+        serializer = TaskSerializer(tasks, many=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
+
+# POST: /task/
 class CreateTask(TestCase):
 
     def setUp(self):
@@ -57,7 +166,6 @@ class CreateTask(TestCase):
         new_task = {
             'task_name': 'Test CreateTaskTest',
             'task_desc': 'test description',
-            'owner': ''
         }
         response = self.client.post(reverse('todo_app:task-list'), new_task)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -85,7 +193,7 @@ class CreateTask(TestCase):
         ).exists()
         self.assertTrue(exists)
 
-    def test_create_task_unsuccessful_with_unvalid(self):
+    def test_create_task_unsuccessful_with_missing_mandatory_information(self):
         """Test create a new task"""
         self.user = User.objects.create_user(
             'test',
@@ -103,3 +211,141 @@ class CreateTask(TestCase):
             task_name=new_task['task_name'],
         ).exists()
         self.assertFalse(exists)
+
+    def test_create_task_unsuccessful_with_wrong_data_type_range(self):
+        """Test create a new task"""
+        self.user = User.objects.create_user(
+            'test',
+            'testpass'
+        )
+        self.client.force_authenticate(self.user)
+        new_task = {
+            'task_name': '00000000000000000000000000000000000000000000000000000000\
+            0000000000000000000000000000000000000000000000000000000000000000000000\
+            0000000000000000000000000000000000000000000000000000000000000000000000',
+            'task_desc': '',
+        }
+        response = self.client.post(reverse('todo_app:task-list'), new_task)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        exists = Task.objects.filter(
+            owner=self.user,
+            task_name=new_task['task_name'],
+        ).exists()
+        self.assertFalse(exists)
+
+# GET: /task/<id>[0-9+]
+class GetTaskDetail(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_login_required_task_detail(self):
+        """Test that login is required to access the endpoint"""
+        user1 = User.objects.create_user(
+            'test1',
+            'testpass'
+        )
+        Task.objects.create(
+            task_name='Test GetAllTasksTest1',
+            task_desc='test description',
+            owner=user1
+        )
+        response = self.client.get(
+            reverse('todo_app:task-detail', kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_retrieve_task_detai_success(self):
+        user1 = User.objects.create_user(
+            'test1',
+            'testpass'
+        )
+        self.task1=Task.objects.create(
+            task_name='Test GetAllTasksTest1',
+            task_desc='test description',
+            owner=user1
+        )
+        self.task2=Task.objects.create(
+            task_name='Test GetAllTasksTest2',
+            task_desc='test description',
+            owner=user1
+        )
+        user2 = User.objects.create_user(
+            'test2',
+            'testpass'
+        )
+        self.task3=Task.objects.create(
+            task_name='Test GetAllTasksTest2',
+            task_desc='test description',
+            owner=user2
+        )
+        self.client.force_authenticate(user1)
+        response = self.client.get(
+            reverse('todo_app:task-detail', kwargs={'pk': self.task1.pk}))
+        task = Task.objects.get(pk=self.task1.pk)
+        serializer = TaskSerializer(task)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
+        
+    def test_retrieve_task_detai_unsuccess_with_wrong_owner(self):
+        user1 = User.objects.create_user(
+            'test1',
+            'testpass'
+        )
+        self.task1=Task.objects.create(
+            task_name='Test GetAllTasksTest1',
+            task_desc='test description',
+            owner=user1
+        )
+        self.task2=Task.objects.create(
+            task_name='Test GetAllTasksTest2',
+            task_desc='test description',
+            owner=user1
+        )
+        user2 = User.objects.create_user(
+            'test2',
+            'testpass'
+        )
+        self.task3=Task.objects.create(
+            task_name='Test GetAllTasksTest2',
+            task_desc='test description',
+            owner=user2
+        )
+        self.client.force_authenticate(user2)
+        response = self.client.get(
+            reverse('todo_app:task-detail', kwargs={'pk': self.task1.pk}))
+        task = Task.objects.get(pk=self.task1.pk)
+        serializer = TaskSerializer(task)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        
+    def test_retrieve_task_detai_unsuccess_with_id_not_exist(self):
+        user1 = User.objects.create_user(
+            'test1',
+            'testpass'
+        )
+        self.task1=Task.objects.create(
+            task_name='Test GetAllTasksTest1',
+            task_desc='test description',
+            owner=user1
+        )
+        self.task2=Task.objects.create(
+            task_name='Test GetAllTasksTest2',
+            task_desc='test description',
+            owner=user1
+        )
+        user2 = User.objects.create_user(
+            'test2',
+            'testpass'
+        )
+        self.task3=Task.objects.create(
+            task_name='Test GetAllTasksTest2',
+            task_desc='test description',
+            owner=user2
+        )
+        self.client.force_authenticate(user2)
+        response = self.client.get(
+            reverse('todo_app:task-detail', kwargs={'pk': '30'}))
+        task = Task.objects.get(pk=self.task1.pk)
+        serializer = TaskSerializer(task)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
