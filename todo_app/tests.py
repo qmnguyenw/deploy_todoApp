@@ -9,12 +9,42 @@ from django.urls import reverse
 from rest_framework import status, response
 
 # GET: /task/
-
-
 class GetTaskList(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        self.user1 = User.objects.create_user(
+            'test1',
+            'testpass'
+        )
+        self.task1 = Task.objects.create(
+            task_name='Test GetAllTasksTest1',
+            task_desc='test description',
+            completed='True',
+            owner=self.user1
+        )
+        self.task2 = Task.objects.create(
+            task_name='Test GetAllTasksTest2',
+            task_desc='test description',
+            completed='False',
+            owner=self.user1
+        )
+        self.task3 = Task.objects.create(
+            task_name='Test GetAllTasksTest3',
+            task_desc='test description',
+            completed='True',
+            owner=self.user1
+        )
+        self.user2 = User.objects.create_user(
+            'test2',
+            'testpass'
+        )
+        self.task4 = Task.objects.create(
+            task_name='Test GetAllTasksTest4',
+            task_desc='test description',
+            completed='True',
+            owner=self.user2
+        )
 
     def test_login_required_task_list(self):
         """Test that login is required to access the endpoint"""
@@ -23,89 +53,16 @@ class GetTaskList(TestCase):
 
     def test_retrieve_task_list(self):
         """Test retrieving a list of tasks with owner is the who login"""
-        user1 = User.objects.create_user(
-            'test1',
-            'testpass'
-        )
-        Task.objects.create(
-            task_name='Test GetAllTasksTest1',
-            task_desc='test description',
-            owner=user1
-        )
-        user2 = User.objects.create_user(
-            'test2',
-            'testpass'
-        )
-        Task.objects.create(
-            task_name='Test GetAllTasksTest2',
-            task_desc='test description',
-            owner=user2
-        )
-        self.client.force_authenticate(user1)
+        self.client.force_authenticate(self.user1)
         response = self.client.get(reverse('todo_app:task-list'))
-        owner = user1
+        owner = self.user1
         tasks = Task.objects.filter(owner_id=owner)
         serializer = TaskSerializer(tasks, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
 
-
 # GET: /task/?completed=[True/Flase]/$
 class GetTaskListCompleted(TestCase):
-
-    def setUp(self):
-        self.client = APIClient()
-
-    def test_login_required_task_list_completed(self):
-        """Test that login is required to access the endpoint"""
-        response = self.client.get('http://testserver/task/?completed=True')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_retrieve_task_list_completed(self):
-        """Test retrieving a list of tasks with owner is the who login"""
-        user1 = User.objects.create_user(
-            'test1',
-            'testpass'
-        )
-        Task.objects.create(
-            task_name='Test GetAllTasksTest1',
-            task_desc='test description',
-            completed='True',
-            owner=user1
-        )
-        Task.objects.create(
-            task_name='Test GetAllTasksTest2',
-            task_desc='test description',
-            completed='False',
-            owner=user1
-        )
-        Task.objects.create(
-            task_name='Test GetAllTasksTest3',
-            task_desc='test description',
-            completed='True',
-            owner=user1
-        )
-        user2 = User.objects.create_user(
-            'test2',
-            'testpass'
-        )
-        Task.objects.create(
-            task_name='Test GetAllTasksTest4',
-            task_desc='test description',
-            completed='True',
-            owner=user2
-        )
-        self.client.force_authenticate(user1)
-        response = self.client.get('http://testserver/task/?completed=True')
-        owner = user1
-        tasks = Task.objects.filter(owner_id=owner, completed=True)
-        serializer = TaskSerializer(tasks, many=True)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, serializer.data)
-
-
-# GET: /task/?search=<title of task, description of task>[a-zA-Z0-9]+/$
-class GetTaskListSearch(TestCase):
 
     def setUp(self):
         self.client = APIClient()
@@ -144,6 +101,59 @@ class GetTaskListSearch(TestCase):
 
     def test_login_required_task_list_completed(self):
         """Test that login is required to access the endpoint"""
+        response = self.client.get('http://testserver/task/?completed=True')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_retrieve_task_list_completed(self):
+        """Test retrieving a list of tasks with owner is the who login"""
+        self.client.force_authenticate(self.user1)
+        response = self.client.get('http://testserver/task/?completed=True')
+        owner = self.user1
+        tasks = Task.objects.filter(owner_id=owner, completed=True)
+        serializer = TaskSerializer(tasks, many=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
+
+# GET: /task/?search=<title of task, description of task>[a-zA-Z0-9]+/$
+class GetTaskListSearch(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user1 = User.objects.create_user(
+            'test1',
+            'testpass'
+        )
+        self.task1 = Task.objects.create(
+            task_name='Test GetAllTasksTest1 TestDemo',
+            task_desc='test description',
+            completed='True',
+            owner=self.user1
+        )
+        self.task2 = Task.objects.create(
+            task_name='Test GetAllTasksTest2 TestDemo',
+            task_desc='test description',
+            completed='False',
+            owner=self.user1
+        )
+        self.task3 = Task.objects.create(
+            task_name='Test GetAllTasksTest3',
+            task_desc='test description',
+            completed='True',
+            owner=self.user1
+        )
+        self.user2 = User.objects.create_user(
+            'test2',
+            'testpass'
+        )
+        self.task4 = Task.objects.create(
+            task_name='Test GetAllTasksTest4 TestDemo',
+            task_desc='test description',
+            completed='True',
+            owner=self.user2
+        )
+
+    def test_login_required_task_list_completed(self):
+        """Test that login is required to access the endpoint"""
         response = self.client.get('http://testserver/task/?search=TestDemo')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -152,14 +162,12 @@ class GetTaskListSearch(TestCase):
         self.client.force_authenticate(self.user1)
         response = self.client.get('http://testserver/task/?search=TestDemo')
         owner = self.user1
-        tasks = Task.objects.filter(owner_id=owner, task_name='')
+        tasks = Task.objects.filter(owner_id=owner, task_name__contain='')
         serializer = TaskSerializer(tasks, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
 
 # POST: /task/
-
-
 class CreateTask(TestCase):
 
     def setUp(self):
