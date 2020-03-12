@@ -9,6 +9,8 @@ from django.urls import reverse
 from rest_framework import status, response
 
 # GET: /task/
+
+
 class GetTaskList(TestCase):
 
     def setUp(self):
@@ -107,55 +109,57 @@ class GetTaskListSearch(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        self.user1 = User.objects.create_user(
+            'test1',
+            'testpass'
+        )
+        self.task1 = Task.objects.create(
+            task_name='Test GetAllTasksTest1',
+            task_desc='test description',
+            completed='True',
+            owner=self.user1
+        )
+        self.task2 = Task.objects.create(
+            task_name='Test GetAllTasksTest2',
+            task_desc='test description',
+            completed='False',
+            owner=self.user1
+        )
+        self.task3 = Task.objects.create(
+            task_name='Test GetAllTasksTest3',
+            task_desc='test description',
+            completed='True',
+            owner=self.user1
+        )
+        self.user2 = User.objects.create_user(
+            'test2',
+            'testpass'
+        )
+        self.task4 = Task.objects.create(
+            task_name='Test GetAllTasksTest4',
+            task_desc='test description',
+            completed='True',
+            owner=self.user2
+        )
 
     def test_login_required_task_list_completed(self):
         """Test that login is required to access the endpoint"""
-        response = self.client.get('http://testserver/task/?completed=True')
+        response = self.client.get('http://testserver/task/?search=TestDemo')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_retrieve_task_list_completed(self):
         """Test retrieving a list of tasks with owner is the who login"""
-        user1 = User.objects.create_user(
-            'test1',
-            'testpass'
-        )
-        Task.objects.create(
-            task_name='Test GetAllTasksTest1',
-            task_desc='test description',
-            completed='True',
-            owner=user1
-        )
-        Task.objects.create(
-            task_name='Test GetAllTasksTest2',
-            task_desc='test description',
-            completed='False',
-            owner=user1
-        )
-        Task.objects.create(
-            task_name='Test GetAllTasksTest3',
-            task_desc='test description',
-            completed='True',
-            owner=user1
-        )
-        user2 = User.objects.create_user(
-            'test2',
-            'testpass'
-        )
-        Task.objects.create(
-            task_name='Test GetAllTasksTest4',
-            task_desc='test description',
-            completed='True',
-            owner=user2
-        )
-        self.client.force_authenticate(user1)
-        response = self.client.get('http://testserver/task/?completed=True')
-        owner = user1
-        tasks = Task.objects.filter(owner_id=owner, completed=True)
+        self.client.force_authenticate(self.user1)
+        response = self.client.get('http://testserver/task/?search=TestDemo')
+        owner = self.user1
+        tasks = Task.objects.filter(owner_id=owner, task_name='')
         serializer = TaskSerializer(tasks, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
 
 # POST: /task/
+
+
 class CreateTask(TestCase):
 
     def setUp(self):
@@ -234,6 +238,8 @@ class CreateTask(TestCase):
         self.assertFalse(exists)
 
 # GET: /task/<id>[0-9+]
+
+
 class GetTaskDetail(TestCase):
 
     def setUp(self):
@@ -259,12 +265,12 @@ class GetTaskDetail(TestCase):
             'test1',
             'testpass'
         )
-        self.task1=Task.objects.create(
+        self.task1 = Task.objects.create(
             task_name='Test GetAllTasksTest1',
             task_desc='test description',
             owner=user1
         )
-        self.task2=Task.objects.create(
+        self.task2 = Task.objects.create(
             task_name='Test GetAllTasksTest2',
             task_desc='test description',
             owner=user1
@@ -273,7 +279,7 @@ class GetTaskDetail(TestCase):
             'test2',
             'testpass'
         )
-        self.task3=Task.objects.create(
+        self.task3 = Task.objects.create(
             task_name='Test GetAllTasksTest2',
             task_desc='test description',
             owner=user2
@@ -285,18 +291,18 @@ class GetTaskDetail(TestCase):
         serializer = TaskSerializer(task)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
-        
+
     def test_retrieve_task_detai_unsuccess_with_wrong_owner(self):
         user1 = User.objects.create_user(
             'test1',
             'testpass'
         )
-        self.task1=Task.objects.create(
+        self.task1 = Task.objects.create(
             task_name='Test GetAllTasksTest1',
             task_desc='test description',
             owner=user1
         )
-        self.task2=Task.objects.create(
+        self.task2 = Task.objects.create(
             task_name='Test GetAllTasksTest2',
             task_desc='test description',
             owner=user1
@@ -305,7 +311,7 @@ class GetTaskDetail(TestCase):
             'test2',
             'testpass'
         )
-        self.task3=Task.objects.create(
+        self.task3 = Task.objects.create(
             task_name='Test GetAllTasksTest2',
             task_desc='test description',
             owner=user2
@@ -316,18 +322,18 @@ class GetTaskDetail(TestCase):
         task = Task.objects.get(pk=self.task1.pk)
         serializer = TaskSerializer(task)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
+
     def test_retrieve_task_detai_unsuccess_with_id_not_exist(self):
         user1 = User.objects.create_user(
             'test1',
             'testpass'
         )
-        self.task1=Task.objects.create(
+        self.task1 = Task.objects.create(
             task_name='Test GetAllTasksTest1',
             task_desc='test description',
             owner=user1
         )
-        self.task2=Task.objects.create(
+        self.task2 = Task.objects.create(
             task_name='Test GetAllTasksTest2',
             task_desc='test description',
             owner=user1
@@ -336,7 +342,7 @@ class GetTaskDetail(TestCase):
             'test2',
             'testpass'
         )
-        self.task3=Task.objects.create(
+        self.task3 = Task.objects.create(
             task_name='Test GetAllTasksTest2',
             task_desc='test description',
             owner=user2
@@ -347,5 +353,3 @@ class GetTaskDetail(TestCase):
         task = Task.objects.get(pk=self.task1.pk)
         serializer = TaskSerializer(task)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-
