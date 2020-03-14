@@ -17,7 +17,7 @@ class GetTaskList(TestCase):
         self.client = APIClient()
         self.user1 = User.objects.create_user(
             'test1',
-            'testpass'
+            password='testpass'
         )
         self.task1 = Task.objects.create(
             task_name='Test GetAllTasksTest1',
@@ -39,7 +39,7 @@ class GetTaskList(TestCase):
         )
         self.user2 = User.objects.create_user(
             'test2',
-            'testpass'
+            password='testpass'
         )
         self.task4 = Task.objects.create(
             task_name='Test GetAllTasksTest4',
@@ -73,7 +73,7 @@ class GetTaskListCompleted(TestCase):
         self.client = APIClient()
         self.user1 = User.objects.create_user(
             'test1',
-            'testpass'
+            password='testpass'
         )
         self.task1 = Task.objects.create(
             task_name='Test GetAllTasksTest1',
@@ -95,7 +95,7 @@ class GetTaskListCompleted(TestCase):
         )
         self.user2 = User.objects.create_user(
             'test2',
-            'testpass'
+            password='testpass'
         )
         self.task4 = Task.objects.create(
             task_name='Test GetAllTasksTest4',
@@ -129,7 +129,7 @@ class GetTaskListSearch(TestCase):
         self.client = APIClient()
         self.user1 = User.objects.create_user(
             'test1',
-            'testpass'
+            password='testpass'
         )
         self.task1 = Task.objects.create(
             task_name='Test GetAllTasksTest1 TestDemo',
@@ -151,7 +151,7 @@ class GetTaskListSearch(TestCase):
         )
         self.user2 = User.objects.create_user(
             'test2',
-            'testpass'
+            password='testpass'
         )
         self.task4 = Task.objects.create(
             task_name='Test GetAllTasksTest4 TestDemo',
@@ -202,7 +202,7 @@ class CreateTask(TestCase):
         """Test create a new task successful"""
         self.user = User.objects.create_user(
             'test',
-            'testpass'
+            password='testpass'
         )
         self.client.force_authenticate(self.user)
         new_task = {
@@ -221,7 +221,7 @@ class CreateTask(TestCase):
         """Test create a new task unsuccessful with missing mandatory information"""
         self.user = User.objects.create_user(
             'test',
-            'testpass'
+            password='testpass'
         )
         self.client.force_authenticate(self.user)
         new_task = {
@@ -240,7 +240,7 @@ class CreateTask(TestCase):
         """Test create a new task unsuccessful with wrong data type/range"""
         self.user = User.objects.create_user(
             'test',
-            'testpass'
+            password='testpass'
         )
         self.client.force_authenticate(self.user)
         new_task = {
@@ -267,7 +267,7 @@ class GetTaskDetail(TestCase):
         self.client = APIClient()
         self.user1 = User.objects.create_user(
             'test1',
-            'testpass'
+            password='testpass'
         )
         self.task1 = Task.objects.create(
             task_name='Test GetAllTasksTest1',
@@ -289,7 +289,7 @@ class GetTaskDetail(TestCase):
         )
         self.user2 = User.objects.create_user(
             'test2',
-            'testpass'
+            password='testpass'
         )
         self.task4 = Task.objects.create(
             task_name='Test GetAllTasksTest4',
@@ -337,7 +337,7 @@ class UpdateTaskDetail(TestCase):
         self.client = APIClient()
         self.user1 = User.objects.create_user(
             'test1',
-            'testpass'
+            password='testpass'
         )
         self.task1 = Task.objects.create(
             task_name='Test GetAllTasksTest1',
@@ -359,7 +359,7 @@ class UpdateTaskDetail(TestCase):
         )
         self.user2 = User.objects.create_user(
             'test2',
-            'testpass'
+            password='testpass'
         )
         self.task4 = Task.objects.create(
             task_name='Test GetAllTasksTest4',
@@ -443,7 +443,7 @@ class DeleteTaskDetail(TestCase):
         self.client = APIClient()
         self.user1 = User.objects.create_user(
             'test1',
-            'testpass'
+            password='testpass'
         )
         self.task1 = Task.objects.create(
             task_name='Test GetAllTasksTest1',
@@ -465,7 +465,7 @@ class DeleteTaskDetail(TestCase):
         )
         self.user2 = User.objects.create_user(
             'test2',
-            'testpass'
+            password='testpass'
         )
         self.task4 = Task.objects.create(
             task_name='Test GetAllTasksTest4',
@@ -517,7 +517,7 @@ class DeleteAllTask(APITestCase):
         self.client = APIClient()
         self.user1 = User.objects.create_user(
             'test1',
-            'testpass'
+            password='testpass'
         )
         self.task1 = Task.objects.create(
             task_name='Test GetAllTasksTest1',
@@ -539,7 +539,7 @@ class DeleteAllTask(APITestCase):
         )
         self.user2 = User.objects.create_user(
             'test2',
-            'testpass'
+            password='testpass'
         )
         self.task4 = Task.objects.create(
             task_name='Test GetAllTasksTest4',
@@ -548,30 +548,16 @@ class DeleteAllTask(APITestCase):
             owner=self.user2
         )
 
-    def test_login_required_task_list(self):
+    def test_delete_task_list_success(self):
         """Test that login is required to access the endpoint"""
-        self.client.force_authenticate(user=self.user1)
-        # self.client.login(username='test1', password='testpass')
+        self.client.login(username='test1', password='testpass')
         response = self.client.get('/task/delete-all')
-        # response1 = self.client.get(reverse('todo_app:task-list'))
         owner = self.user1
         tasks = Task.objects.filter(owner_id=owner)
         serializer = TaskSerializer(tasks, many=True)
-        # self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # self.assertEqual(response.data, serializer.data)
-        print(serializer.data)
-        print(response.status_code)
-        # print(Task.objects.all())
-        # self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    # def test_delete_task_detai_success(self):
-    #     """Test delete task detail success"""
-    #     self.client.force_authenticate(self.user1)
-    #     task_delete_name=self.task1.task_name
-    #     response = self.client.delete(
-    #         reverse('todo_app:task-detail', kwargs={'pk': self.task1.pk}))
-    #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-    #     exists = Task.objects.filter(
-    #         task_name=task_delete_name,
-    #     ).exists()
-    #     self.assertFalse(exists)
+        self.assertEqual([],serializer.data)
+        tasks_user2 = Task.objects.filter(owner_id=self.user2)
+        serializer_user2 = TaskSerializer(tasks_user2, many=True)
+        self.assertNotEqual([], serializer_user2.data)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        

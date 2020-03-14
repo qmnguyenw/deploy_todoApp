@@ -8,8 +8,8 @@ class Task(models.Model):
     # date_created = models.DateTimeField(auto_now=True)
     completed = models.BooleanField(default=False)
     image = models.ImageField(
-        upload_to='images/', default='images/none/none.jpg')
-    doc = models.FileField(upload_to='docs/', default='docs/none/none.txt')
+        upload_to='images/', default=None) #'images/none/none.jpg'
+    doc = models.FileField(upload_to='docs/', default=None) # 'docs/none/none.txt'
     owner = models.ForeignKey(
         'auth.User', related_name='task', on_delete=models.CASCADE, default="1")
 
