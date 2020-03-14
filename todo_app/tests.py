@@ -3,10 +3,10 @@ from .models import Task
 from .serializers import TaskSerializer
 from django.contrib.auth.models import User
 from django.test import TestCase
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 import json
 from django.urls import reverse
-from rest_framework import status, response
+from rest_framework import status, response, request
 
 '''GET: /task/'''
 
@@ -382,7 +382,6 @@ class UpdateTaskDetail(TestCase):
         self.client.force_authenticate(self.user1)
         task = Task.objects.get(pk=self.task1.pk)
         serializer = TaskSerializer(task)
-        print(serializer.data)
         update_task = {
             'task_name': 'Test Update',
             'task_desc': 'test update',
@@ -391,8 +390,6 @@ class UpdateTaskDetail(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         task = Task.objects.get(pk=self.task1.pk)
         serializer = TaskSerializer(task)
-        print(response.data)
-        print(serializer.data)
         self.assertEqual(response.data, serializer.data)
 
     def test_update_task_unsuccess_id_not_exist(self):
@@ -514,3 +511,67 @@ class DeleteTaskDetail(TestCase):
             reverse('todo_app:task-detail', kwargs={'pk': '30'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+'''GET: /task/delete-all'''
+class DeleteAllTask(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user1 = User.objects.create_user(
+            'test1',
+            'testpass'
+        )
+        self.task1 = Task.objects.create(
+            task_name='Test GetAllTasksTest1',
+            task_desc='test description',
+            completed='True',
+            owner=self.user1
+        )
+        self.task2 = Task.objects.create(
+            task_name='Test GetAllTasksTest2',
+            task_desc='test description',
+            completed='False',
+            owner=self.user1
+        )
+        self.task3 = Task.objects.create(
+            task_name='Test GetAllTasksTest3',
+            task_desc='test description',
+            completed='True',
+            owner=self.user1
+        )
+        self.user2 = User.objects.create_user(
+            'test2',
+            'testpass'
+        )
+        self.task4 = Task.objects.create(
+            task_name='Test GetAllTasksTest4',
+            task_desc='test description',
+            completed='True',
+            owner=self.user2
+        )
+
+    def test_login_required_task_list(self):
+        """Test that login is required to access the endpoint"""
+        self.client.force_authenticate(user=self.user1)
+        # self.client.login(username='test1', password='testpass')
+        response = self.client.get('/task/delete-all')
+        # response1 = self.client.get(reverse('todo_app:task-list'))
+        owner = self.user1
+        tasks = Task.objects.filter(owner_id=owner)
+        serializer = TaskSerializer(tasks, many=True)
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # self.assertEqual(response.data, serializer.data)
+        print(serializer.data)
+        print(response.status_code)
+        # print(Task.objects.all())
+        # self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    # def test_delete_task_detai_success(self):
+    #     """Test delete task detail success"""
+    #     self.client.force_authenticate(self.user1)
+    #     task_delete_name=self.task1.task_name
+    #     response = self.client.delete(
+    #         reverse('todo_app:task-detail', kwargs={'pk': self.task1.pk}))
+    #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+    #     exists = Task.objects.filter(
+    #         task_name=task_delete_name,
+    #     ).exists()
+    #     self.assertFalse(exists)

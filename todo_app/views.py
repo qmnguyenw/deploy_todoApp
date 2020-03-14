@@ -5,11 +5,11 @@ from .serializers import TaskSerializer
 from .models import Task
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication, BasicAuthentication
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 class TaskViewSet(viewsets.ModelViewSet):
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
-    # authentication_classes = (BasicAuthentication, SessionAuthentication)
+    # authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (BasicAuthentication, SessionAuthentication)
     # only Authenticated User can perform CRUD operation
     permission_classes = (IsAuthenticated,)
     queryset = Task.objects.all()  # use filter and ordering so remove order_by
@@ -35,6 +35,10 @@ class TaskViewSet(viewsets.ModelViewSet):
 
 def deleteAll(request):
     permission_classes = (IsAuthenticated,)
-    owner = request.user
-    Task.objects.filter(owner_id=owner).delete()
-    return HttpResponseRedirect(redirect_to='/task/')
+    if request.user.is_authenticated:
+        owner = request.user
+        Task.objects.filter(owner_id=owner).delete()
+        responseReturn=HttpResponseRedirect(redirect_to='/task/')
+    else:
+        responseReturn=JsonResponse({"message":"why"})
+    return responseReturn
