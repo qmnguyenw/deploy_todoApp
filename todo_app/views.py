@@ -1,11 +1,14 @@
-from rest_framework import viewsets
-from rest_framework import filters
 import django_filters.rest_framework
-from .serializers import TaskSerializer
-from .models import Task
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authentication import TokenAuthentication, SessionAuthentication, BasicAuthentication
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from rest_framework import filters, viewsets
+from rest_framework.authentication import (BasicAuthentication,
+                                           SessionAuthentication,
+                                           TokenAuthentication)
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from .models import Task
+from .serializers import TaskSerializer
+
 
 class TaskViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication, SessionAuthentication)

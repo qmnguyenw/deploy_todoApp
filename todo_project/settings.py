@@ -26,11 +26,12 @@ SECRET_KEY = 'u9e%yl01f_bq4+s%0q#c*=ye4+-$0@4rxy82fhtuoydw&@ps7_'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    # 'testserver',
-    # '127.0.0.1',
-    'todoappsimple.azurewebsites.net'
+    'testserver',
+    'localhost',
+    '127.0.0.1',
+    'todoappsimple.azurewebsites.net',
+    '*'
 ]
-
 
 # Application definition
 
@@ -55,7 +56,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # new
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -87,13 +88,26 @@ WSGI_APPLICATION = 'todo_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'sql_server.pyodbc',
+        'NAME': 'pollsdb',
+        'USER': 'mysecretname@quangdwemosqlserver',
+        'PASSWORD': '123456a@',
+        'HOST': 'quangdwemosqlserver.database.windows.net',
+        'PORT': '',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -147,7 +161,8 @@ LOGIN_REDIRECT_URL = '/task'
 
 # REST FRAMEWORK SETTINGS
 REST_FRAMEWORK = {
-    # "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema", #new
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 1
 }
 
 # ADD CORS TO FRONTEND CAN ACCESS BACKEND
