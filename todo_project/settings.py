@@ -98,10 +98,10 @@ WSGI_APPLICATION = 'todo_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'pollsdb',
-        'USER': 'mysecretname@quangdwemosqlserver',
+        'NAME': 'todoDB',
+        'USER': 'mysecretname@todoWebServer',
         'PASSWORD': '123456a@',
-        'HOST': 'quangdwemosqlserver.database.windows.net',
+        'HOST': 'todoWebServer.database.windows.net',
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
