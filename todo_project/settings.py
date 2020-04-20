@@ -101,7 +101,7 @@ DATABASES = {
         'NAME': 'todoDB',
         'USER': 'mysecretname@todoWebServer',
         'PASSWORD': '123456a@',
-        'HOST': 'todoWebServer.database.windows.net',
+        'HOST': 'todowebserver.database.windows.net',
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
@@ -162,7 +162,7 @@ LOGIN_REDIRECT_URL = '/task'
 # REST FRAMEWORK SETTINGS
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 1
+    'PAGE_SIZE': 2
 }
 
 # ADD CORS TO FRONTEND CAN ACCESS BACKEND

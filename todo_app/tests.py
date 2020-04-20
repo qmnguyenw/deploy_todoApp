@@ -60,8 +60,15 @@ class GetTaskList(TestCase):
         owner = self.user1
         tasks = Task.objects.filter(owner_id=owner)
         serializer = TaskSerializer(tasks, many=True)
+        data_total = response.data['results']
+        while response.data['next']!=None:
+            response = self.client.get(response.data['next'])
+            data_total += response.data['results']
+        
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, serializer.data)
+        # self.assertEqual(response.data, serializer.data)
+        # fix when pagination
+        self.assertEqual(data_total, serializer.data)
 
 
 '''GET: /task/?completed=[True/Flase]/$'''
@@ -117,7 +124,7 @@ class GetTaskListCompleted(TestCase):
         tasks = Task.objects.filter(owner_id=owner, completed=True)
         serializer = TaskSerializer(tasks, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.data['results'], serializer.data)
 
 
 '''GET: /task/?search=<title of task, description of task>[a-zA-Z0-9]+/$'''
@@ -174,7 +181,7 @@ class GetTaskListSearch(TestCase):
             owner_id=owner, task_name__contains='TestDemo')
         serializer = TaskSerializer(tasks, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.data['results'], serializer.data)
 
 
 '''POST: /task/'''
